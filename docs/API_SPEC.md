@@ -24,7 +24,7 @@ Request:
 {
   "email": "user@example.com",
   "password": "password123!",
-  "nickname": "승연"
+  "nickname": "docuUser"
 }
 ```
 
@@ -34,7 +34,7 @@ Response:
 {
   "userId": 1,
   "email": "user@example.com",
-  "nickname": "승연",
+  "nickname": "docuUser",
   "createdAt": "2026-05-26T09:00:00"
 }
 ```
@@ -110,7 +110,7 @@ Response:
 {
   "userId": 1,
   "email": "user@example.com",
-  "nickname": "승연",
+  "nickname": "docuUser",
   "createdAt": "2026-05-26T09:00:00"
 }
 ```
@@ -125,7 +125,7 @@ Request:
 
 ```json
 {
-  "nickname": "새닉네임"
+  "nickname": "updatedDocuUser"
 }
 ```
 
@@ -135,7 +135,7 @@ Response:
 {
   "userId": 1,
   "email": "user@example.com",
-  "nickname": "새닉네임",
+  "nickname": "updatedDocuUser",
   "updatedAt": "2026-05-26T10:00:00"
 }
 ```
