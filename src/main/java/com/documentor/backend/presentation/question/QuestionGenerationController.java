@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,10 +26,11 @@ public class QuestionGenerationController {
     @PostMapping("/documents/{documentId}/question-generations")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public QuestionGenerationResponse createQuestionGeneration(
+            @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long documentId,
             @Valid @RequestBody QuestionGenerationRequest request
     ) {
-        QuestionGenerationResult result = questionGenerationService.create(documentId, request.toCommand());
+        QuestionGenerationResult result = questionGenerationService.create(authorizationHeader, documentId, request.toCommand());
         return QuestionGenerationResponse.from(result);
     }
 

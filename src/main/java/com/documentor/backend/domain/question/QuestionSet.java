@@ -74,6 +74,11 @@ public class QuestionSet {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void addQuestion(Question question) {
+        this.questions.add(question);
+        this.updatedAt = LocalDateTime.now();
+    }
+
     public boolean isOwnedBy(Long userId) {
         return owner.getId().equals(userId);
     }
