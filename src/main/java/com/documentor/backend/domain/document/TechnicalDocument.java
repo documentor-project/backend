@@ -1,5 +1,7 @@
 package com.documentor.backend.domain.document;
 
+import com.documentor.backend.domain.common.BusinessException;
+import com.documentor.backend.domain.common.ErrorCode;
 import com.documentor.backend.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +56,7 @@ public class TechnicalDocument {
         this.title = title;
         this.fileName = fileName;
         this.fileType = fileType;
-        this.status = DocumentStatus.READY;
+        this.status = DocumentStatus.UPLOADED;
         this.chunkCount = 0;
         this.createdAt = LocalDateTime.now();
     }
@@ -63,12 +65,45 @@ public class TechnicalDocument {
         return new TechnicalDocument(owner, title, fileName, fileType);
     }
 
+    public void markParsing() {
+        ensureStatus(DocumentStatus.UPLOADED, "업로드된 문서만 파싱을 시작할 수 있습니다.");
+        this.status = DocumentStatus.PARSING;
+    }
+
+    public void markEmbedding() {
+        ensureStatus(DocumentStatus.PARSING, "파싱 중인 문서만 임베딩을 시작할 수 있습니다.");
+        this.status = DocumentStatus.EMBEDDING;
+    }
+
+    public void markReady(int chunkCount) {
+        ensureStatus(DocumentStatus.EMBEDDING, "임베딩 중인 문서만 준비 완료 상태로 전환할 수 있습니다.");
+        if (chunkCount <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_RESOURCE_STATE, "문서 청크가 생성되지 않았습니다.");
+        }
+        this.status = DocumentStatus.READY;
+        this.chunkCount = chunkCount;
+    }
+
+    public void markFailed() {
+        this.status = DocumentStatus.FAILED;
+    }
+
     public boolean isOwnedBy(Long userId) {
         return owner.getId().equals(userId);
     }
 
+    private void ensureStatus(DocumentStatus expected, String message) {
+        if (this.status != expected) {
+            throw new BusinessException(ErrorCode.INVALID_RESOURCE_STATE, message);
+        }
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public User getOwner() {
+        return owner;
     }
 
     public String getTitle() {

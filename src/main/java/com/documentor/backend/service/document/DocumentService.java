@@ -8,6 +8,7 @@ import com.documentor.backend.domain.user.User;
 import com.documentor.backend.infra.document.TechnicalDocumentRepository;
 import com.documentor.backend.infra.security.AuthenticatedUserResolver;
 import com.documentor.backend.infra.user.UserRepository;
+import java.nio.file.Path;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,15 +22,21 @@ public class DocumentService {
     private final TechnicalDocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final AuthenticatedUserResolver authenticatedUserResolver;
+    private final DocumentFileStorage documentFileStorage;
+    private final DocumentEmbeddingService documentEmbeddingService;
 
     public DocumentService(
             TechnicalDocumentRepository documentRepository,
             UserRepository userRepository,
-            AuthenticatedUserResolver authenticatedUserResolver
+            AuthenticatedUserResolver authenticatedUserResolver,
+            DocumentFileStorage documentFileStorage,
+            DocumentEmbeddingService documentEmbeddingService
     ) {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.authenticatedUserResolver = authenticatedUserResolver;
+        this.documentFileStorage = documentFileStorage;
+        this.documentEmbeddingService = documentEmbeddingService;
     }
 
     public DocumentResult upload(String authorizationHeader, String title, MultipartFile file) {
@@ -39,8 +46,10 @@ public class DocumentService {
 
         validateFile(file);
         DocumentFileType fileType = DocumentFileType.fromFileName(file.getOriginalFilename());
-        TechnicalDocument document = TechnicalDocument.create(owner, title, file.getOriginalFilename(), fileType);
-        return DocumentResult.from(documentRepository.save(document));
+        TechnicalDocument document = documentRepository.save(TechnicalDocument.create(owner, title, file.getOriginalFilename(), fileType));
+        Path filePath = documentFileStorage.store(document.getId(), file);
+        documentEmbeddingService.process(document.getId(), filePath);
+        return DocumentResult.from(document);
     }
 
     public Page<DocumentResult> getDocuments(String authorizationHeader, Pageable pageable) {
