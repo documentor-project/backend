@@ -44,3 +44,5 @@ app:
     refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION_SECONDS:1209600}
   mail:
     from: ${MAIL_FROM:no-reply@documentor.local}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
