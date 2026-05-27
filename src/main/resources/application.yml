@@ -33,11 +33,17 @@ spring:
       chat:
         options:
           model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
 
 server:
   port: 8080
 
 app:
+  document:
+    storage-path: ${DOCUMENT_STORAGE_PATH:./data/documents}
+
   jwt:
     secret: ${JWT_SECRET:documentor-local-development-secret-key-change-me}
     access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS:3600}

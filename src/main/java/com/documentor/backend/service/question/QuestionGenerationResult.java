@@ -32,4 +32,52 @@ public record QuestionGenerationResult(
                 null
         );
     }
+
+    public QuestionGenerationResult processing() {
+        return new QuestionGenerationResult(
+                generationId,
+                documentId,
+                GenerationStatus.PROCESSING,
+                50,
+                requestedQuestionCount,
+                createdQuestionCount,
+                skippedQuestionCount,
+                skipReason,
+                questionSetId,
+                createdAt,
+                null
+        );
+    }
+
+    public QuestionGenerationResult completed(int createdQuestionCount, int skippedQuestionCount, String skipReason, Long questionSetId) {
+        return new QuestionGenerationResult(
+                generationId,
+                documentId,
+                GenerationStatus.COMPLETED,
+                100,
+                requestedQuestionCount,
+                createdQuestionCount,
+                skippedQuestionCount,
+                skipReason,
+                questionSetId,
+                createdAt,
+                LocalDateTime.now()
+        );
+    }
+
+    public QuestionGenerationResult failed(String skipReason) {
+        return new QuestionGenerationResult(
+                generationId,
+                documentId,
+                GenerationStatus.FAILED,
+                100,
+                requestedQuestionCount,
+                createdQuestionCount,
+                requestedQuestionCount,
+                skipReason,
+                questionSetId,
+                createdAt,
+                LocalDateTime.now()
+        );
+    }
 }
