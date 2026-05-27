@@ -20,3 +20,6 @@ build/
 ### Environment ###
 .env
 .env.*
+config/*.yml
+config/*.yaml
+config/*.env

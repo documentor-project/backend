@@ -1,0 +1,10 @@
+.git
+.gradle
+build
+.idea
+.vscode
+.DS_Store
+config
+*.log
+README.md
+docs
