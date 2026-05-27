@@ -11,7 +11,8 @@ public record ReviewDeliveryResult(
         String email,
         int questionCount,
         DeliveryStatus status,
-        LocalDateTime sentAt
+        LocalDateTime sentAt,
+        String failureReason
 ) {
 
     public static ReviewDeliveryResult from(ReviewDelivery delivery) {
@@ -22,7 +23,8 @@ public record ReviewDeliveryResult(
                 delivery.getEmail(),
                 delivery.getQuestionCount(),
                 delivery.getStatus(),
-                delivery.getSentAt()
+                delivery.getSentAt(),
+                delivery.getFailureReason()
         );
     }
 }

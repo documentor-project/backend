@@ -6,6 +6,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableAsync
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 @EnableScheduling
 @SpringBootApplication
 public class BackendApplication {

@@ -4,6 +4,7 @@ import com.documentor.backend.domain.common.BusinessException;
 import com.documentor.backend.domain.common.ErrorCode;
 import com.documentor.backend.domain.notification.NotificationSetting;
 import com.documentor.backend.domain.notification.ReviewDelivery;
+import com.documentor.backend.domain.question.Question;
 import com.documentor.backend.domain.question.QuestionSet;
 import com.documentor.backend.domain.user.User;
 import com.documentor.backend.infra.notification.NotificationSettingRepository;
@@ -13,9 +14,11 @@ import com.documentor.backend.infra.security.AuthenticatedUserResolver;
 import com.documentor.backend.infra.user.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificationService {
@@ -25,19 +28,22 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final QuestionSetRepository questionSetRepository;
     private final AuthenticatedUserResolver authenticatedUserResolver;
+    private final ReviewEmailSender reviewEmailSender;
 
     public NotificationService(
             NotificationSettingRepository notificationSettingRepository,
             ReviewDeliveryRepository reviewDeliveryRepository,
             UserRepository userRepository,
             QuestionSetRepository questionSetRepository,
-            AuthenticatedUserResolver authenticatedUserResolver
+            AuthenticatedUserResolver authenticatedUserResolver,
+            ReviewEmailSender reviewEmailSender
     ) {
         this.notificationSettingRepository = notificationSettingRepository;
         this.reviewDeliveryRepository = reviewDeliveryRepository;
         this.userRepository = userRepository;
         this.questionSetRepository = questionSetRepository;
         this.authenticatedUserResolver = authenticatedUserResolver;
+        this.reviewEmailSender = reviewEmailSender;
     }
 
     public NotificationSettingResult getMySetting(String authorizationHeader) {
@@ -69,13 +75,14 @@ public class NotificationService {
                 .map(ReviewDeliveryResult::from);
     }
 
+    @Transactional
     public void sendDueReviewQuestions() {
         LocalTime now = LocalTime.now().withSecond(0).withNano(0);
         notificationSettingRepository.findAll()
                 .stream()
                 .filter(setting -> setting.shouldSendAt(now))
                 .filter(setting -> !alreadyDeliveredToday(setting))
-                .forEach(this::recordSentDelivery);
+                .forEach(this::sendAndRecordDelivery);
     }
 
     private boolean alreadyDeliveredToday(NotificationSetting setting) {
@@ -86,14 +93,30 @@ public class NotificationService {
         );
     }
 
-    private void recordSentDelivery(NotificationSetting setting) {
-        ReviewDelivery delivery = ReviewDelivery.sent(
-                setting.getUser(),
-                setting.getQuestionSet(),
-                setting.getEmail(),
-                setting.getQuestionCount()
-        );
-        reviewDeliveryRepository.save(delivery);
+    private void sendAndRecordDelivery(NotificationSetting setting) {
+        List<Question> questions = setting.getQuestionSet()
+                .getQuestions()
+                .stream()
+                .limit(setting.getQuestionCount())
+                .toList();
+
+        try {
+            reviewEmailSender.send(setting, questions);
+            reviewDeliveryRepository.save(ReviewDelivery.sent(
+                    setting.getUser(),
+                    setting.getQuestionSet(),
+                    setting.getEmail(),
+                    questions.size()
+            ));
+        } catch (RuntimeException exception) {
+            reviewDeliveryRepository.save(ReviewDelivery.failed(
+                    setting.getUser(),
+                    setting.getQuestionSet(),
+                    setting.getEmail(),
+                    questions.size(),
+                    exception.getMessage()
+            ));
+        }
     }
 
     private User getAuthenticatedUser(String authorizationHeader) {

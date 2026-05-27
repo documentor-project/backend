@@ -47,10 +47,13 @@ public class ReviewDelivery {
 
     private LocalDateTime sentAt;
 
+    @Column(length = 1000)
+    private String failureReason;
+
     protected ReviewDelivery() {
     }
 
-    private ReviewDelivery(User user, QuestionSet questionSet, String email, int questionCount, DeliveryStatus status) {
+    private ReviewDelivery(User user, QuestionSet questionSet, String email, int questionCount, DeliveryStatus status, String failureReason) {
         this.user = user;
         this.questionSet = questionSet;
         this.email = email;
@@ -58,10 +61,15 @@ public class ReviewDelivery {
         this.status = status;
         this.deliveryDate = LocalDate.now();
         this.sentAt = status == DeliveryStatus.SENT ? LocalDateTime.now() : null;
+        this.failureReason = failureReason;
     }
 
     public static ReviewDelivery sent(User user, QuestionSet questionSet, String email, int questionCount) {
-        return new ReviewDelivery(user, questionSet, email, questionCount, DeliveryStatus.SENT);
+        return new ReviewDelivery(user, questionSet, email, questionCount, DeliveryStatus.SENT, null);
+    }
+
+    public static ReviewDelivery failed(User user, QuestionSet questionSet, String email, int questionCount, String failureReason) {
+        return new ReviewDelivery(user, questionSet, email, questionCount, DeliveryStatus.FAILED, failureReason);
     }
 
     public Long getId() {
@@ -86,5 +94,9 @@ public class ReviewDelivery {
 
     public LocalDateTime getSentAt() {
         return sentAt;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
     }
 }
