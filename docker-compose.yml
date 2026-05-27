@@ -38,8 +38,9 @@ services:
     restart: unless-stopped
     depends_on:
       - app
-    environment:
-      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+    env_file:
+      - path: ./config/.env
+        required: false
     ports:
       - "80:80"
       - "443:443"
