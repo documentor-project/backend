@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: documentor-backend
+    restart: unless-stopped
+    env_file:
+      - path: ./config/.env
+        required: false
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JAVA_OPTS: ${JAVA_OPTS:-}
+      SERVER_PORT: 8080
+      H2_DATASOURCE_URL: ${H2_DATASOURCE_URL:-jdbc:h2:file:/data/documentor/documentor;MODE=MySQL;DATABASE_TO_LOWER=TRUE}
+      H2_USERNAME: ${H2_USERNAME:-sa}
+      H2_PASSWORD: ${H2_PASSWORD:-}
+      JWT_ACCESS_TOKEN_EXPIRATION_SECONDS: ${JWT_ACCESS_TOKEN_EXPIRATION_SECONDS:-3600}
+      JWT_REFRESH_TOKEN_EXPIRATION_SECONDS: ${JWT_REFRESH_TOKEN_EXPIRATION_SECONDS:-1209600}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_AUTH: ${SMTP_AUTH:-true}
+      SMTP_STARTTLS_ENABLE: ${SMTP_STARTTLS_ENABLE:-true}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      DOCUMENT_STORAGE_PATH: ${DOCUMENT_STORAGE_PATH:-/data/documentor/documents}
+    volumes:
+      - h2-data:/data/documentor
+      - ./config:/app/config:ro
+    expose:
+      - "8080"
+    networks:
+      - documentor
+
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: documentor-caddy
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - documentor
+
+volumes:
+  h2-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  documentor:
+    driver: bridge
