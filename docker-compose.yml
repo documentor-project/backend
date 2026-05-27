@@ -1,5 +1,6 @@
 services:
   app:
+    image: ${DOCKER_IMAGE:-jumdo12/documentor-backend:latest}
     build:
       context: .
       dockerfile: Dockerfile
