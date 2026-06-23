@@ -1,5 +1,6 @@
 package com.documentor.backend.domain.question;
 
+import com.documentor.backend.domain.common.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "questions")
-public class Question {
+public class Question extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,9 +57,6 @@ public class Question {
 
     private LocalDateTime answeredAt;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
     protected Question() {
     }
 
@@ -68,7 +66,6 @@ public class Question {
         this.difficulty = difficulty;
         this.content = content;
         this.source = source;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static Question create(QuestionSet questionSet, QuestionType type, QuestionDifficulty difficulty, String content, QuestionSource source) {
@@ -132,7 +129,4 @@ public class Question {
         return answeredAt;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 }

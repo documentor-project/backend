@@ -1,5 +1,6 @@
 package com.documentor.backend.domain.notification;
 
+import com.documentor.backend.domain.common.BaseEntity;
 import com.documentor.backend.domain.question.QuestionSet;
 import com.documentor.backend.domain.user.User;
 import jakarta.persistence.Column;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review_deliveries")
-public class ReviewDelivery {
+public class ReviewDelivery extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

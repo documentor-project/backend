@@ -1,5 +1,6 @@
 package com.documentor.backend.domain.question;
 
+import com.documentor.backend.domain.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "follow_up_questions")
-public class FollowUpQuestion {
+public class FollowUpQuestion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package com.documentor.backend.domain.share;
 
+import com.documentor.backend.domain.common.BaseEntity;
 import com.documentor.backend.domain.question.QuestionSet;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "share_links")
-public class ShareLink {
+public class ShareLink extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +30,6 @@ public class ShareLink {
 
     private LocalDateTime expiresAt;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
     protected ShareLink() {
     }
 
@@ -39,7 +37,6 @@ public class ShareLink {
         this.questionSet = questionSet;
         this.token = token;
         this.expiresAt = expiresAt;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static ShareLink create(QuestionSet questionSet, String token, LocalDateTime expiresAt) {
@@ -70,7 +67,4 @@ public class ShareLink {
         return expiresAt;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 }
