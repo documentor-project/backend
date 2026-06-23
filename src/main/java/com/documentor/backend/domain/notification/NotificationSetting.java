@@ -1,5 +1,6 @@
 package com.documentor.backend.domain.notification;
 
+import com.documentor.backend.domain.common.BaseEntity;
 import com.documentor.backend.domain.question.QuestionSet;
 import com.documentor.backend.domain.user.User;
 import jakarta.persistence.Column;
@@ -12,12 +13,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "notification_settings")
-public class NotificationSetting {
+public class NotificationSetting extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +43,6 @@ public class NotificationSetting {
     @Column(nullable = false)
     private int questionCount;
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
     protected NotificationSetting() {
     }
 
@@ -55,7 +52,6 @@ public class NotificationSetting {
         this.email = user.getEmail();
         this.sendTime = LocalTime.of(9, 0);
         this.questionCount = 3;
-        this.updatedAt = LocalDateTime.now();
     }
 
     public static NotificationSetting createDefault(User user) {
@@ -68,7 +64,6 @@ public class NotificationSetting {
         this.sendTime = sendTime;
         this.questionCount = questionCount;
         this.questionSet = questionSet;
-        this.updatedAt = LocalDateTime.now();
     }
 
     public boolean shouldSendAt(LocalTime now) {
@@ -106,7 +101,4 @@ public class NotificationSetting {
         return questionCount;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 }

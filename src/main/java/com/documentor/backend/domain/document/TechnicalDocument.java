@@ -1,6 +1,7 @@
 package com.documentor.backend.domain.document;
 
 import com.documentor.backend.domain.common.BusinessException;
+import com.documentor.backend.domain.common.BaseEntity;
 import com.documentor.backend.domain.common.ErrorCode;
 import com.documentor.backend.domain.user.User;
 import jakarta.persistence.Column;
@@ -14,11 +15,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "documents")
-public class TechnicalDocument {
+public class TechnicalDocument extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,9 +45,6 @@ public class TechnicalDocument {
     @Column(nullable = false)
     private int chunkCount;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
     protected TechnicalDocument() {
     }
 
@@ -58,7 +55,6 @@ public class TechnicalDocument {
         this.fileType = fileType;
         this.status = DocumentStatus.UPLOADED;
         this.chunkCount = 0;
-        this.createdAt = LocalDateTime.now();
     }
 
     public static TechnicalDocument create(User owner, String title, String fileName, DocumentFileType fileType) {
@@ -126,7 +122,4 @@ public class TechnicalDocument {
         return chunkCount;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 }
