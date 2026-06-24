@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -33,7 +33,7 @@ spring:
       chat:
         options:
           model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
-      embedding:
+      embedding:  
         options:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
 
