@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DocumentService {
 
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
+    private static final long MAX_FILE_SIZE = 100L * 1024 * 1024;
 
     private final TechnicalDocumentRepository documentRepository;
     private final UserRepository userRepository;
@@ -83,7 +83,7 @@ public class DocumentService {
             throw new BusinessException(ErrorCode.INVALID_REQUEST, "업로드할 파일이 필요합니다.");
         }
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new BusinessException(ErrorCode.INVALID_REQUEST, "파일 크기는 10MB를 초과할 수 없습니다.");
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "파일 크기는 100MB를 초과할 수 없습니다.");
         }
     }
 }

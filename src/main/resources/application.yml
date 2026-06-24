@@ -10,6 +10,11 @@ spring:
       - optional:file:./config/application.yml
       - optional:file:./config/application-${spring.profiles.active}.yml
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
+
   jpa:
     hibernate:
       ddl-auto: create
