@@ -3,6 +3,7 @@ package com.documentor.backend.infra.mail;
 import com.documentor.backend.domain.notification.NotificationSetting;
 import com.documentor.backend.domain.question.Question;
 import com.documentor.backend.service.notification.ReviewEmailSender;
+import com.documentor.backend.service.notification.ReviewEmailSender.ReviewEmailQuestion;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -26,42 +27,59 @@ public class SmtpReviewEmailSender implements ReviewEmailSender {
 
     @Override
     public void send(NotificationSetting setting, List<Question> questions) {
+        List<ReviewEmailQuestion> emailQuestions = questions.stream()
+                .map(question -> new ReviewEmailQuestion(
+                        question.getContent(),
+                        question.getSource() == null ? null : question.getSource().getSnippet()
+                ))
+                .toList();
+
+        send(
+                setting.getEmail(),
+                setting.getQuestionSet().getTitle(),
+                setting.getQuestionSet().getDocument().getTitle(),
+                emailQuestions
+        );
+    }
+
+    @Override
+    public void send(String recipient, String questionSetTitle, String documentTitle, List<ReviewEmailQuestion> questions) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
-        message.setTo(setting.getEmail());
-        message.setSubject("[DocuMentor] 오늘의 복습 질문");
-        message.setText(createBody(setting, questions));
+        message.setTo(recipient);
+        message.setSubject("[DocuMentor] \uc624\ub298\uc758 \ubcf5\uc2b5 \uc9c8\ubb38");
+        message.setText(createBody(questionSetTitle, documentTitle, questions));
 
         try {
             mailSender.send(message);
         } catch (MailException exception) {
-            throw new IllegalStateException("이메일 발송에 실패했습니다.", exception);
+            throw new IllegalStateException("\uc774\uba54\uc77c \ubc1c\uc1a1\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4.", exception);
         }
     }
 
-    private String createBody(NotificationSetting setting, List<Question> questions) {
+    private String createBody(String questionSetTitle, String documentTitle, List<ReviewEmailQuestion> questions) {
         StringBuilder body = new StringBuilder();
-        body.append("오늘의 DocuMentor 복습 질문입니다.\n\n");
-        body.append("질문 리스트: ").append(setting.getQuestionSet().getTitle()).append("\n");
-        body.append("문서: ").append(setting.getQuestionSet().getDocument().getTitle()).append("\n\n");
+        body.append("\uc624\ub298\uc758 DocuMentor \ubcf5\uc2b5 \uc9c8\ubb38\uc785\ub2c8\ub2e4.\n\n");
+        body.append("\uc9c8\ubb38 \ub9ac\uc2a4\ud2b8: ").append(questionSetTitle).append("\n");
+        body.append("\ubb38\uc11c: ").append(documentTitle).append("\n\n");
 
         for (int index = 0; index < questions.size(); index++) {
-            Question question = questions.get(index);
+            ReviewEmailQuestion question = questions.get(index);
             body.append(index + 1)
                     .append(". ")
-                    .append(question.getContent())
+                    .append(question.content())
                     .append("\n");
 
-            if (question.getSource() != null && question.getSource().getSnippet() != null) {
-                body.append("   출처: ")
-                        .append(question.getSource().getSnippet())
+            if (question.sourceSnippet() != null && !question.sourceSnippet().isBlank()) {
+                body.append("   \ucd9c\ucc98: ")
+                        .append(question.sourceSnippet())
                         .append("\n");
             }
             body.append("\n");
         }
 
         if (questions.isEmpty()) {
-            body.append("아직 발송할 질문이 없습니다.\n");
+            body.append("\uc544\uc9c1 \ubc1c\uc1a1\ud560 \uc9c8\ubb38\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.\n");
         }
 
         return body.toString();
