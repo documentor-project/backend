@@ -75,6 +75,33 @@ public class NotificationService {
                 .map(ReviewDeliveryResult::from);
     }
 
+    public TestReviewEmailResult sendTestReviewEmail(String authorizationHeader) {
+        authenticatedUserResolver.resolve(authorizationHeader);
+        String recipient = "jumdo12@gmail.com";
+        List<ReviewEmailSender.ReviewEmailQuestion> questions = List.of(
+                new ReviewEmailSender.ReviewEmailQuestion(
+                        "\uc2a4\ud504\ub9c1\uc5d0\uc11c @Transactional\uc774 \uc801\uc6a9\ub418\ub294 \uae30\ubcf8 \uc6d0\ub9ac\ub294 \ubb34\uc5c7\uc778\uac00\uc694?",
+                        "Spring AOP proxy intercepts method calls and manages transaction boundaries."
+                ),
+                new ReviewEmailSender.ReviewEmailQuestion(
+                        "\ubb38\uc11c \ud30c\uc2f1, \uc784\ubca0\ub529, READY \uc0c1\ud0dc\ub294 \uac01\uac01 \uc5b8\uc81c \uc0ac\uc6a9\ub418\ub098\uc694?",
+                        "Document status flows from UPLOADED to PARSING, EMBEDDING, and READY."
+                ),
+                new ReviewEmailSender.ReviewEmailQuestion(
+                        "\ubcf5\uc2b5 \uc54c\ub9bc\uc740 \uc5b4\ub5a4 \uc870\uac74\uc5d0\uc11c \ud558\ub8e8 \ud55c \ubc88\ub9cc \ubc1c\uc1a1\ub418\ub098\uc694?",
+                        "Notification settings are checked every minute and duplicate daily deliveries are skipped."
+                )
+        );
+
+        reviewEmailSender.send(
+                recipient,
+                "SMTP \ud14c\uc2a4\ud2b8 \ubcf5\uc2b5 \uc9c8\ubb38",
+                "DocuMentor \ud14c\uc2a4\ud2b8 \ubb38\uc11c",
+                questions
+        );
+        return new TestReviewEmailResult(recipient, questions.size());
+    }
+
     @Transactional
     public void sendDueReviewQuestions() {
         LocalTime now = LocalTime.now().withSecond(0).withNano(0);

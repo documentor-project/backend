@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -45,5 +46,10 @@ public class NotificationController {
     ) {
         Page<ReviewDeliveryResult> result = notificationService.getReviewDeliveries(authorizationHeader, PageRequest.of(page, size));
         return PageResponse.from(result.map(ReviewDeliveryResponse::from));
+    }
+
+    @PostMapping("/review-deliveries/test-email")
+    public TestReviewEmailResponse sendTestReviewEmail(@RequestHeader("Authorization") String authorizationHeader) {
+        return TestReviewEmailResponse.from(notificationService.sendTestReviewEmail(authorizationHeader));
     }
 }
