@@ -1,0 +1,338 @@
+{
+  "datasetId": "documentor-rag-baseline-v1",
+  "version": 1,
+  "language": "ko",
+  "description": "DocuMentor 검색 품질을 평가하기 위한 원본 기술 문서 기반 질의셋이다. expectedEvidence는 청크 ID가 아닌 문서·섹션·근거 문장을 사용하므로 청킹 전략 변경 후에도 재사용할 수 있다.",
+  "evaluationGuidelines": {
+    "retrieval": "expectedEvidence.anchorText를 포함하거나 해당 sectionTitle에 속한 청크가 topK에 포함되면 정답 근거를 찾은 것으로 판단한다.",
+    "generation": "생성된 질문은 expectedEvidence의 내용으로 답할 수 있어야 하며, 문서에 없는 사실을 전제하면 안 된다.",
+    "comparison": "개선 전후에는 동일한 모델, 동일한 평가 질의, 동일한 topK와 측정 일자를 기록한다."
+  },
+  "queries": [
+    {
+      "id": "spring-01",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "생성자 주입이 필수 의존성에 권장되는 이유를 설명하는 면접 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BEGINNER",
+      "questionType": "CONCEPT",
+      "expectedEvidence": {
+        "sectionTitle": "DI가 필요한 이유",
+        "anchorText": "생성자 주입은 필수 의존성을 객체 생성 시점에 확정하고, 필드를 final로 만들 수 있다는 장점이 있다.",
+        "expectedKeywords": ["생성자 주입", "필수 의존성", "final", "순환 의존성"]
+      }
+    },
+    {
+      "id": "spring-02",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "Spring IoC Container와 Bean의 관계를 확인하는 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BEGINNER",
+      "questionType": "CONCEPT",
+      "expectedEvidence": {
+        "sectionTitle": "IoC Container와 Bean",
+        "anchorText": "Spring IoC Container는 애플리케이션에서 사용할 객체를 생성하고, 의존 관계를 연결하며, 생명주기를 관리한다.",
+        "expectedKeywords": ["IoC Container", "Bean", "의존 관계", "생명주기"]
+      }
+    },
+    {
+      "id": "spring-03",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "@Primary와 @Qualifier를 언제 각각 사용해야 하는지 묻는 비교 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "IoC Container와 Bean",
+        "anchorText": "@Primary는 기본 선택 규칙이고, @Qualifier는 특정 구현체를 정확히 선택해야 할 때 사용한다.",
+        "expectedKeywords": ["@Primary", "@Qualifier", "기본 후보", "특정 구현체"]
+      }
+    },
+    {
+      "id": "spring-04",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "singleton Bean에 요청별 상태를 저장하면 안 되는 이유를 묻는 실무 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BASIC",
+      "questionType": "PRACTICAL",
+      "expectedEvidence": {
+        "sectionTitle": "Bean Scope",
+        "anchorText": "singleton Bean에 요청별 상태나 사용자별 상태를 필드로 보관하면 동시성 문제가 발생할 수 있다.",
+        "expectedKeywords": ["singleton", "요청별 상태", "필드", "동시성"]
+      }
+    },
+    {
+      "id": "spring-05",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "prototype scope의 소멸 처리가 singleton과 어떻게 다른지 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "Bean Scope",
+        "anchorText": "prototype Bean은 생성과 의존성 주입까지는 Container가 담당하지만, 클라이언트에게 반환한 후의 소멸 관리는 클라이언트 책임이다.",
+        "expectedKeywords": ["prototype", "소멸", "클라이언트 책임", "Container"]
+      }
+    },
+    {
+      "id": "spring-06",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "singleton Bean에서 매번 새로운 prototype Bean이 필요할 때의 해결 방안을 묻는 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "Bean Scope",
+        "anchorText": "매 요청마다 새로운 prototype Bean이 필요하면 ObjectProvider 또는 scoped proxy를 사용한다.",
+        "expectedKeywords": ["prototype", "ObjectProvider", "scoped proxy", "singleton"]
+      }
+    },
+    {
+      "id": "spring-07",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "@PostConstruct와 @PreDestroy의 실행 시점과 사용 목적을 비교하는 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "Bean Lifecycle",
+        "anchorText": "@PostConstruct는 의존성 주입이 끝난 뒤 실행된다.",
+        "expectedKeywords": ["@PostConstruct", "@PreDestroy", "의존성 주입", "Container 종료"]
+      }
+    },
+    {
+      "id": "spring-08",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "@PostConstruct에서 긴 네트워크 호출을 수행할 때의 위험을 묻는 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "Bean Lifecycle",
+        "anchorText": "@PostConstruct에서 오래 걸리는 네트워크 호출을 수행하면 애플리케이션 시작 시간이 길어지고, 실패 시 기동 자체가 실패할 수 있다.",
+        "expectedKeywords": ["@PostConstruct", "네트워크 호출", "기동 실패", "비동기"]
+      }
+    },
+    {
+      "id": "spring-09",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "생성자 주입에서 순환 의존성이 발생했을 때 단순히 @Lazy로 해결하지 말아야 하는 이유를 질문으로 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "순환 의존성",
+        "anchorText": "이를 @Lazy로 숨기기보다 두 서비스가 동시에 맡고 있는 책임을 분리하는 것이 우선이다.",
+        "expectedKeywords": ["순환 의존성", "@Lazy", "책임 분리", "Coordinator"]
+      }
+    },
+    {
+      "id": "spring-10",
+      "documentId": "spring-di-bean-lifecycle",
+      "query": "필드 주입보다 생성자 주입이 단위 테스트에 유리한 이유를 묻는 질문을 만들어줘.",
+      "field": "SPRING",
+      "difficulty": "BASIC",
+      "questionType": "PRACTICAL",
+      "expectedEvidence": {
+        "sectionTitle": "테스트 관점",
+        "anchorText": "생성자 주입을 사용하면 Spring Context를 띄우지 않아도 단위 테스트에서 가짜 구현체를 주입할 수 있다.",
+        "expectedKeywords": ["생성자 주입", "단위 테스트", "가짜 구현체", "Spring Context"]
+      }
+    },
+    {
+      "id": "jpa-01",
+      "documentId": "jpa-persistence-context",
+      "query": "Persistence Context와 EntityManager의 역할을 확인하는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BEGINNER",
+      "questionType": "CONCEPT",
+      "expectedEvidence": {
+        "sectionTitle": "Persistence Context의 역할",
+        "anchorText": "Persistence Context는 엔티티를 영속 상태로 관리하는 공간이다. EntityManager는 Persistence Context에 접근하는 창구 역할을 한다.",
+        "expectedKeywords": ["Persistence Context", "EntityManager", "영속 상태", "1차 캐시"]
+      }
+    },
+    {
+      "id": "jpa-02",
+      "documentId": "jpa-persistence-context",
+      "query": "save를 다시 호출하지 않아도 수정 SQL이 실행될 수 있는 이유를 묻는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BASIC",
+      "questionType": "CONCEPT",
+      "expectedEvidence": {
+        "sectionTitle": "Persistence Context의 역할",
+        "anchorText": "위 코드에서는 save()를 다시 호출하지 않아도 트랜잭션이 끝날 때 변경 감지(dirty checking)가 일어나 수정 SQL이 실행될 수 있다.",
+        "expectedKeywords": ["dirty checking", "영속 상태", "트랜잭션", "UPDATE"]
+      }
+    },
+    {
+      "id": "jpa-03",
+      "documentId": "jpa-persistence-context",
+      "query": "JPA 엔티티의 영속 상태와 준영속 상태의 차이를 비교하는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "Entity State",
+        "anchorText": "준영속 엔티티의 필드를 바꿔도 Persistence Context는 변경을 추적하지 않는다.",
+        "expectedKeywords": ["영속", "준영속", "변경 추적", "Persistence Context"]
+      }
+    },
+    {
+      "id": "jpa-04",
+      "documentId": "jpa-persistence-context",
+      "query": "API 요청 객체를 merge로 바로 업데이트할 때 발생할 수 있는 문제를 질문으로 만들어줘.",
+      "field": "JPA",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "Entity State",
+        "anchorText": "API 요청으로 받은 객체를 곧바로 merge()하면 전달되지 않은 필드가 null로 덮일 위험이 있다.",
+        "expectedKeywords": ["merge", "null", "준영속", "영속 엔티티 조회"]
+      }
+    },
+    {
+      "id": "jpa-05",
+      "documentId": "jpa-persistence-context",
+      "query": "flush와 commit의 차이를 정확히 설명하도록 유도하는 비교 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "Dirty Checking과 Flush",
+        "anchorText": "flush가 곧 트랜잭션 commit을 의미하지는 않는다. commit은 트랜잭션을 확정하는 작업이고, flush는 SQL을 데이터베이스에 보내는 동기화 과정이다.",
+        "expectedKeywords": ["flush", "commit", "동기화", "rollback"]
+      }
+    },
+    {
+      "id": "jpa-06",
+      "documentId": "jpa-persistence-context",
+      "query": "self-invocation 때문에 @Transactional이 기대와 다르게 동작하는 상황을 묻는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "Transaction Boundary",
+        "anchorText": "같은 클래스 안에서 this.someTransactionalMethod()처럼 호출하는 self-invocation은 프록시를 거치지 않으므로 의도한 트랜잭션 속성이 적용되지 않을 수 있다.",
+        "expectedKeywords": ["self-invocation", "프록시", "@Transactional", "같은 클래스"]
+      }
+    },
+    {
+      "id": "jpa-07",
+      "documentId": "jpa-persistence-context",
+      "query": "REQUIRED와 REQUIRES_NEW의 차이와 REQUIRES_NEW 남용 위험을 묻는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "ADVANCED",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "Transaction Boundary",
+        "anchorText": "REQUIRES_NEW를 남용하면 부분 커밋으로 인해 업무 일관성이 깨질 수 있으므로, 감사 로그처럼 독립적으로 남겨야 하는 작업에 제한적으로 사용한다.",
+        "expectedKeywords": ["REQUIRED", "REQUIRES_NEW", "부분 커밋", "업무 일관성"]
+      }
+    },
+    {
+      "id": "jpa-08",
+      "documentId": "jpa-persistence-context",
+      "query": "readOnly transaction이 쓰기를 완전히 막는 보안 장치가 아닌 이유를 질문으로 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BASIC",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "읽기 전용 Transaction",
+        "anchorText": "데이터베이스와 드라이버 설정에 따라 쓰기 SQL이 완전히 차단되는 것은 아니며, 중요한 쓰기 방지는 권한과 애플리케이션 로직으로 보장해야 한다.",
+        "expectedKeywords": ["readOnly", "쓰기 SQL", "권한", "보안 장치"]
+      }
+    },
+    {
+      "id": "jpa-09",
+      "documentId": "jpa-persistence-context",
+      "query": "N+1 문제가 발생하는 원인과 해결 선택지를 확인하는 실무 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "BASIC",
+      "questionType": "PRACTICAL",
+      "expectedEvidence": {
+        "sectionTitle": "N+1 Query와 Fetch Join",
+        "anchorText": "필요한 연관 데이터를 한 번에 읽어야 하는 조회에는 fetch join, EntityGraph, DTO projection을 상황에 맞게 선택한다.",
+        "expectedKeywords": ["N+1", "LAZY", "fetch join", "EntityGraph", "DTO projection"]
+      }
+    },
+    {
+      "id": "jpa-10",
+      "documentId": "jpa-persistence-context",
+      "query": "낙관적 잠금과 비관적 잠금의 적용 상황과 주의점을 비교하는 질문을 만들어줘.",
+      "field": "JPA",
+      "difficulty": "ADVANCED",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "낙관적 잠금과 비관적 잠금",
+        "anchorText": "낙관적 잠금은 엔티티의 @Version 값을 이용해 업데이트 시점에 충돌을 감지한다.",
+        "expectedKeywords": ["낙관적 잠금", "비관적 잠금", "@Version", "데드락", "재시도"]
+      }
+    },
+    {
+      "id": "concurrency-01",
+      "documentId": "java-concurrency-completablefuture",
+      "query": "Spring singleton service에 요청별 데이터를 필드로 저장하면 안 되는 이유를 질문으로 만들어줘.",
+      "field": "CS",
+      "difficulty": "BASIC",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "Thread safety and shared state",
+        "anchorText": "Spring singleton service에는 요청별 데이터를 필드에 저장하지 말고 메서드 지역 변수나 요청 객체로 전달해야 한다.",
+        "expectedKeywords": ["singleton service", "요청별 데이터", "공유 가변 상태", "race condition"]
+      }
+    },
+    {
+      "id": "concurrency-02",
+      "documentId": "java-concurrency-completablefuture",
+      "query": "ExecutorService를 사용해야 하는 이유와 스레드 풀 설정 시 고려할 점을 묻는 질문을 만들어줘.",
+      "field": "CS",
+      "difficulty": "BASIC",
+      "questionType": "PRACTICAL",
+      "expectedEvidence": {
+        "sectionTitle": "ExecutorService and thread pools",
+        "anchorText": "서비스의 처리량, 대기 시간, 외부 API 제한을 고려해 풀 크기와 큐 크기, 거부 정책을 정해야 한다.",
+        "expectedKeywords": ["ExecutorService", "스레드 풀", "큐", "거부 정책", "외부 API"]
+      }
+    },
+    {
+      "id": "concurrency-03",
+      "documentId": "java-concurrency-completablefuture",
+      "query": "thenApply와 thenCompose의 차이를 묻는 비교 질문을 만들어줘.",
+      "field": "CS",
+      "difficulty": "BASIC",
+      "questionType": "COMPARISON",
+      "expectedEvidence": {
+        "sectionTitle": "CompletableFuture composition",
+        "anchorText": "thenCompose는 앞 결과를 이용해 또 다른 CompletableFuture를 반환하는 비동기 작업을 연결할 때 사용한다.",
+        "expectedKeywords": ["thenApply", "thenCompose", "CompletableFuture", "중첩 future"]
+      }
+    },
+    {
+      "id": "concurrency-04",
+      "documentId": "java-concurrency-completablefuture",
+      "query": "CompletableFuture에서 Executor를 명시해야 하는 이유를 확인하는 질문을 만들어줘.",
+      "field": "CS",
+      "difficulty": "ADVANCED",
+      "questionType": "TROUBLESHOOTING",
+      "expectedEvidence": {
+        "sectionTitle": "CompletableFuture composition",
+        "anchorText": "웹 요청 처리, CPU 작업, 외부 I/O 작업을 모두 같은 공용 풀에 섞으면 서로 영향을 줄 수 있으므로 서비스 특성에 맞는 Executor를 명시하는 편이 안전하다.",
+        "expectedKeywords": ["Executor", "common ForkJoinPool", "CPU", "I/O", "공용 풀"]
+      }
+    },
+    {
+      "id": "concurrency-05",
+      "documentId": "java-concurrency-completablefuture",
+      "query": "RAG 문서 임베딩 작업에 backpressure와 Job 관리가 필요한 이유를 질문으로 만들어줘.",
+      "field": "CS",
+      "difficulty": "ADVANCED",
+      "questionType": "PRACTICAL",
+      "expectedEvidence": {
+        "sectionTitle": "Timeout and backpressure",
+        "anchorText": "RAG 문서 임베딩처럼 비용이 큰 작업은 업로드 요청을 받은 뒤 Job을 만들고, 작업 큐의 용량과 동시 실행 수를 제한하며, 사용자가 진행 상태를 조회할 수 있게 설계하는 것이 좋다.",
+        "expectedKeywords": ["RAG", "임베딩", "backpressure", "Job", "작업 큐"]
+      }
+    }
+  ]
+}
