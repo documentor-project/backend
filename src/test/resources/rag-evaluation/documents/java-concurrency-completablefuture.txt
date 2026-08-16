@@ -1,0 +1,42 @@
+Java Concurrency and CompletableFuture
+
+Thread safety and shared state
+
+여러 스레드가 같은 가변 객체를 동시에 수정하면 실행 순서에 따라 결과가 달라질 수 있다. 이를 race condition이라고 한다. Counter의 count++ 연산은 읽기, 증가, 쓰기의 여러 단계로 구성되므로 원자적이지 않다. 단순한 카운터에는 AtomicInteger를 사용할 수 있고, 여러 필드를 함께 변경해야 한다면 임계 구역을 작게 유지하면서 synchronized 또는 Lock을 검토한다.
+
+동시성 문제를 줄이는 가장 단순한 방법은 공유 가변 상태를 줄이는 것이다. Spring singleton service에는 요청별 데이터를 필드에 저장하지 말고 메서드 지역 변수나 요청 객체로 전달해야 한다. 불변 객체는 생성 이후 상태가 바뀌지 않으므로 여러 스레드에서 안전하게 공유하기 쉽다.
+
+ExecutorService and thread pools
+
+작업마다 새로운 Thread를 만들면 생성 비용과 스케줄링 비용이 커지고, 동시에 많은 요청이 들어올 때 시스템 자원이 고갈될 수 있다. ExecutorService는 미리 준비한 스레드 풀에서 작업을 실행한다. CPU 연산 중심 작업과 네트워크 I/O 대기 중심 작업은 적절한 스레드 수가 다를 수 있다.
+
+무제한 큐와 무제한 최대 스레드 수를 함께 사용하면 과부하가 발생했을 때 요청이 계속 쌓여 응답 시간이 급격히 늘어날 수 있다. 서비스의 처리량, 대기 시간, 외부 API 제한을 고려해 풀 크기와 큐 크기, 거부 정책을 정해야 한다.
+
+CompletableFuture composition
+
+CompletableFuture는 비동기 작업의 완료 결과를 표현하고 여러 작업을 조합할 수 있게 해 준다. supplyAsync는 값을 반환하는 비동기 작업을 시작하고, thenApply는 앞 작업의 결과를 변환한다. thenCompose는 앞 결과를 이용해 또 다른 CompletableFuture를 반환하는 비동기 작업을 연결할 때 사용한다.
+
+thenApply를 사용해야 할 자리에 thenCompose를 쓰지 않으면 CompletableFuture<CompletableFuture<T>>처럼 중첩된 future가 생길 수 있다. 반대로 독립적인 두 작업 결과를 합쳐야 할 때는 thenCombine을 사용할 수 있다.
+
+CompletableFuture.supplyAsync(() -> documentClient.fetch(documentId), ioExecutor)
+    .thenApply(Document::content)
+    .thenCompose(content -> embeddingClient.embedAsync(content))
+    .thenAccept(vectorStore::save)
+    .exceptionally(error -> {
+        jobRepository.markFailed(jobId, error.getMessage());
+        return null;
+    });
+
+기본적으로 supplyAsync에 Executor를 전달하지 않으면 common ForkJoinPool을 사용할 수 있다. 웹 요청 처리, CPU 작업, 외부 I/O 작업을 모두 같은 공용 풀에 섞으면 서로 영향을 줄 수 있으므로 서비스 특성에 맞는 Executor를 명시하는 편이 안전하다.
+
+Exception and cancellation
+
+비동기 체인에서 발생한 예외는 get 또는 join 시점에 관찰될 수 있다. exceptionally는 예외가 발생했을 때 대체 결과를 반환하는 방식으로 복구할 수 있고, handle은 성공과 실패 결과를 모두 받아 처리할 수 있다. 실패를 기록해야 하는 비즈니스 작업에서는 예외를 단순히 삼키지 말고 작업 ID, 입력 값, 실패 유형을 함께 남겨야 한다.
+
+cancel(true)는 Future를 취소 요청하지만, 이미 실행 중인 작업이 반드시 즉시 멈추는 것은 아니다. 작업 코드가 interrupt를 적절히 처리해야 하며, 외부 HTTP 요청이나 데이터베이스 작업은 별도 timeout 설정도 필요하다.
+
+Timeout and backpressure
+
+외부 API 호출에는 connect timeout과 read timeout을 설정해야 한다. CompletableFuture의 orTimeout을 사용하면 완료 제한 시간을 둘 수 있지만, 타임아웃 뒤에도 하위 작업이 계속 자원을 사용할 가능성을 고려해야 한다.
+
+요청이 처리 가능한 속도보다 빠르게 들어오면 큐에 작업이 쌓인다. 이를 backpressure 문제로 볼 수 있다. RAG 문서 임베딩처럼 비용이 큰 작업은 업로드 요청을 받은 뒤 Job을 만들고, 작업 큐의 용량과 동시 실행 수를 제한하며, 사용자가 진행 상태를 조회할 수 있게 설계하는 것이 좋다.
